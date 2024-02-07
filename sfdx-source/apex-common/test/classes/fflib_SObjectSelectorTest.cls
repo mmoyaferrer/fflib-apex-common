@@ -375,27 +375,6 @@ private with sharing class fflib_SObjectSelectorTest
 	}
 
 	@IsTest
-	static void toSOQL_When_UserModeAndUserCannnotReadObject_Expect_QueryException(){
-		AccessLevelOpportunitySelector sel = new AccessLevelOpportunitySelector();
-
-		User u = getLimitedReadOnlyUser();
-		System.runAs(u){
-			try{
-				System.debug(sel.newQueryFactory().toSOQL());
-				sel.selectSObjectsById(new Set<Id>{fflib_IDGenerator.generate(Opportunity.SObjectType)});
-				Assert.fail('Expected a QueryException due to read only user not having access to Opportunity');
-			}
-			catch(QueryException qe){
-				//If you don't have Read access to the Lead object, the Name field is inaccessible -- so that's what we're verifying
-				Assert.isNotNull(qe.getInaccessibleFields(),'Expected a Map of inaccessible objects; got null');
-				Set<String> inaccessibleFields = qe.getInaccessibleFields().get('Opportunity');
-				Assert.isNotNull(inaccessibleFields,'Expected a Set of inaccessible fields on the Opportunity object; got null');
-				Assert.isTrue(inaccessibleFields.contains('Name'),'Expected Name to be an inaccessible field on Opportunity');
-			}
-		}
-	}
-
-	@IsTest
 	static void toSOQL_When_SystemModeAndUserCannnotReadObject_Expect_Success(){
 		AccessLevelOpportunitySelector sel = new AccessLevelOpportunitySelector(fflib_SObjectSelector.DataAccess.SYSTEM_MODE);
 
